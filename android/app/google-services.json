@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "466610445872",
+    "project_id": "sweetcakes-49453",
+    "storage_bucket": "sweetcakes-49453.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:466610445872:android:cfa05aaa934701726097f5",
+        "android_client_info": {
+          "package_name": "com.example.sweetcakes"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDBjOt4fR6bQvDaqWn9Dfc3Bxnr_qyNuk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
