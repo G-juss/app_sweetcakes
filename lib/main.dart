@@ -13,7 +13,6 @@ await Firebase.initializeApp(
   options: DefaultFirebaseOptions.currentPlatform,
 );
 runApp(const MyApp());
-   runApp(const MyApp());
 }
 
 
@@ -22,11 +21,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-     final providers = [EmailAuthProvider()];
-
-    void onSignedIn() {
-      Navigator.pushReplacementNamed(context, '/profile');
-    }
+    final providers = [EmailAuthProvider()];
 
     return MaterialApp(
       initialRoute: FirebaseAuth.instance.currentUser == null ? '/sign-in' : '/profile',
@@ -35,12 +30,12 @@ class MyApp extends StatelessWidget {
           return SignInScreen(
             providers: providers,
             actions: [
-              AuthStateChangeAction<UserCreated>((context, state) {
+                AuthStateChangeAction<UserCreated>((context, state) {
                 // Put any new user logic here
-                onSignedIn();
+                Navigator.of(context, rootNavigator: true).pushReplacementNamed('/profile');
               }),
               AuthStateChangeAction<SignedIn>((context, state) {
-                onSignedIn();
+                Navigator.of(context, rootNavigator: true).pushReplacementNamed('/profile');
               }),
             ],
           );
@@ -50,7 +45,7 @@ class MyApp extends StatelessWidget {
             providers: providers,
             actions: [
               SignedOutAction((context) {
-                Navigator.pushReplacementNamed(context, '/sign-in');
+                Navigator.of(context, rootNavigator: true).pushReplacementNamed('/sign-in');
               }),
             ],
           );
