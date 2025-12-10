@@ -4,13 +4,34 @@
 
 <p align="center">El Sistema de pedidos para pastelería</p>
 
+###
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Miguel007/Miguel007/output/pacman-contribution-graph-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Miguel007/Miguel007/output/pacman-contribution-graph.svg">
+  <img alt="pacman contribution graph" src="https://raw.githubusercontent.com/Miguel007/Miguel007/output/pacman-contribution-graph.svg">
+</picture>
+
+###
 
 <p align="left">Grupo #3<br><br>Ingeniería de Software 2 — Sección 233<br><br>John Fithgerald Ramos Escobar – 62321444<br><br>Miguel Angel Carranza Avilez – 62211533<br><br>Fernanda Nicole Dubón – 62311253<br><br>Génesis Jusselphy Medina Anariba – 62251243<br><br>Liza Valentina Torres Mena – 62311470</p>
 
 ###
 
 <div align="center">
-  <img height="300" src="[https://files.catbox.moe/y3yf11.png](https://files.catbox.moe/0w84xp.jpeg)"  />
+  <img height="400" src="https://files.catbox.moe/casghl.jpeg"  />
+</div>
+
+###
+
+<div align="center">
+  <img height="400" src="https://files.catbox.moe/0w84xp.jpeg"  />
+</div>
+
+###
+
+<div align="center">
+  <img height="400" src="https://files.catbox.moe/2g16tg.jpeg"  />
 </div>
 
 ###
