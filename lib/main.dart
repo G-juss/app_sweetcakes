@@ -10,12 +10,27 @@ import 'screens/home_screen.dart';
 import 'screens/cart_screen.dart';
 import 'screens/profile_screen.dart'; 
 import 'screens/custom_sign_in_screen.dart'; 
+import 'screens/admin_products_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+
+  try {
+    // Conexion a Firebase
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    
+    // Mensaje de confirmacion
+    print("\n-------------------------------------------------------------");
+    print("✅ ¡Conectado a la Base de datos! (Firebase Inicializado)");
+    print("-------------------------------------------------------------\n");
+
+  } catch (e) {
+    // Si falla, imprimirá esto:
+    print("\n❌ Error al conectar con Firebase: $e \n");
+  }
+
   runApp(const MyApp());
 }
 
@@ -79,6 +94,7 @@ class MyApp extends StatelessWidget {
         '/profile': (context) => const UserProfileScreen(),
         '/home': (context) => HomeScreen(),
         '/cart': (context) => CartScreen(),
+        '/admin-products': (context) => AdminProductsScreen(),
       },
     );
   }
