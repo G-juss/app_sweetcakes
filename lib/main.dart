@@ -8,26 +8,23 @@ import 'package:firebase_ui_localizations/firebase_ui_localizations.dart';
 // Importaciones de tus pantallas
 import 'screens/home_screen.dart';
 import 'screens/cart_screen.dart';
-import 'screens/profile_screen.dart'; 
-import 'screens/custom_sign_in_screen.dart'; 
+import 'screens/profile_screen.dart';
+import 'screens/custom_sign_in_screen.dart';
 import 'screens/admin_products_screen.dart';
+import 'screens/select_role_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    // Conexion a Firebase
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    
-    // Mensaje de confirmacion
+
     print("\n-------------------------------------------------------------");
     print("✅ ¡Conectado a la Base de datos! (Firebase Inicializado)");
     print("-------------------------------------------------------------\n");
-
   } catch (e) {
-    // Si falla, imprimirá esto:
     print("\n❌ Error al conectar con Firebase: $e \n");
   }
 
@@ -43,8 +40,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'SweetCakes',
 
-      // 1. CONFIGURACIÓN DE IDIOMA (ESPAÑOL)
-      localizationsDelegates: [
+      // 1) IDIOMA
+      localizationsDelegates: const [
         FirebaseUILocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -54,24 +51,20 @@ class MyApp extends StatelessWidget {
         Locale('es', 'ES'),
       ],
 
-      // 2. TEMA PERSONALIZADO (Diseño Rosita)
+      // 2) TEMA
       theme: ThemeData(
-        primaryColor: const Color(0xFFFF80AB), 
-        scaffoldBackgroundColor: const Color(0xFFFFF0F5), 
+        primaryColor: const Color(0xFFFF80AB),
+        scaffoldBackgroundColor: const Color(0xFFFFF0F5),
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFFFF80AB),
           primary: const Color(0xFFFF80AB),
         ),
         useMaterial3: true,
-        
-        // Estilo de tarjetas
-        cardTheme: CardThemeData( 
+        cardTheme: CardThemeData(
           color: Colors.white,
           elevation: 4,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         ),
-        
-        // Estilo de los Inputs (Cajas de texto)
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
           fillColor: Colors.white,
@@ -83,19 +76,37 @@ class MyApp extends StatelessWidget {
         ),
       ),
 
-      // 3. RUTAS Y NAVEGACIÓN
-      // Si hay usuario, va al Home. Si no, al Login.
-      initialRoute: FirebaseAuth.instance.currentUser == null ? '/sign-in' : '/home',
-      
+      // ✅ 3) ENTRADA: decide si mostrar SelectRole o Home según sesión
+      home: const _AuthGate(),
+
+      // ✅ 4) RUTAS
       routes: {
-        // Conectamos tu diseño personalizado
+        '/select-role': (context) => const SelectRoleScreen(),
         '/sign-in': (context) => const CustomSignInScreen(),
-        
-        '/profile': (context) => const UserProfileScreen(),
+
         '/home': (context) => HomeScreen(),
         '/cart': (context) => CartScreen(),
-        '/admin-products': (context) => AdminProductsScreen(),
+        '/profile': (context) => const UserProfileScreen(),
+
+        '/admin-products': (context) => const AdminProductsScreen(),
       },
     );
+  }
+}
+
+// ✅ Decide qué pantalla se muestra dependiendo de si hay sesión
+class _AuthGate extends StatelessWidget {
+  const _AuthGate();
+
+  @override
+  Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      return const SelectRoleScreen();
+    }
+
+    // Si hay sesión, entra al Home (el admin se maneja al login / guard)
+    return HomeScreen();
   }
 }
