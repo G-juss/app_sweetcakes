@@ -17,8 +17,8 @@ class HomeScreen extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
         title: const Text(
-          'SweetCakes', 
-          style: TextStyle(color: Color(0xFF2D2D2D), fontWeight: FontWeight.bold)
+          'SweetCakes',
+          style: TextStyle(color: Color(0xFF2D2D2D), fontWeight: FontWeight.bold),
         ),
         iconTheme: const IconThemeData(color: Color(0xFFFF80AB)),
         actions: [
@@ -49,9 +49,11 @@ class HomeScreen extends StatelessWidget {
               builder: (context, snapshot) {
                 if (snapshot.hasError) return Center(child: Text('Error: ${snapshot.error}'));
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(color: Color(0xFFFF80AB)));
+                  return const Center(
+                    child: CircularProgressIndicator(color: Color(0xFFFF80AB)),
+                  );
                 }
-                
+
                 final postres = snapshot.data ?? [];
 
                 if (postres.isEmpty) {
@@ -64,29 +66,46 @@ class HomeScreen extends StatelessWidget {
                         const Text('El catálogo está vacío'),
                         TextButton(
                           onPressed: () => Navigator.pushNamed(context, '/admin-products'),
-                          child: const Text('Ir a Gestión de Productos', style: TextStyle(color: Color(0xFFFF80AB))),
+                          child: const Text(
+                            'Ir a Gestión de Productos',
+                            style: TextStyle(color: Color(0xFFFF80AB)),
+                          ),
                         )
                       ],
                     ),
                   );
                 }
-                
+
                 return GridView.builder(
                   padding: const EdgeInsets.all(12),
                   itemCount: postres.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    childAspectRatio: 0.70, // Ajustado para que quepa bien
+                    childAspectRatio: 0.70,
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
                   ),
                   itemBuilder: (context, index) {
                     return PostreCard(
                       postre: postres[index],
-                      onAgregar: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Agregaste ${postres[index].nombre}')),
-                        );
+                      onAgregar: () async {
+                        // 1) Guardar en carrito (Firestore)
+                        await _firestoreService.agregarAlCarrito(postres[index]);
+
+                        // 2) Confirmación visual
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('¡${postres[index].nombre} agregado al carrito! ✅'),
+                              backgroundColor: const Color(0xFFFF80AB),
+                              duration: const Duration(seconds: 1),
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          );
+                        }
                       },
                     );
                   },
@@ -106,24 +125,29 @@ class HomeScreen extends StatelessWidget {
           const DrawerHeader(
             decoration: BoxDecoration(color: Color(0xFFFF80AB)),
             child: Center(
-              child: Text('Menú', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+              child: Text(
+                'Menú',
+                style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+              ),
             ),
           ),
           ListTile(
             leading: const Icon(Icons.person_outline),
-            title: const Text('Perfil'), 
-            onTap: () => Navigator.pushNamed(context, '/profile')
+            title: const Text('Perfil'),
+            onTap: () => Navigator.pushNamed(context, '/profile'),
           ),
           ListTile(
             leading: const Icon(Icons.shopping_bag_outlined),
-            title: const Text('Carrito'), 
-            onTap: () => Navigator.pushNamed(context, '/cart')
+            title: const Text('Carrito'),
+            onTap: () => Navigator.pushNamed(context, '/cart'),
           ),
           const Divider(),
-          // OPCIÓN DE ADMIN
           ListTile(
             leading: const Icon(Icons.admin_panel_settings_outlined, color: Color(0xFFFF80AB)),
-            title: const Text('Gestión de Productos', style: TextStyle(color: Color(0xFFFF80AB), fontWeight: FontWeight.bold)),
+            title: const Text(
+              'Gestión de Productos',
+              style: TextStyle(color: Color(0xFFFF80AB), fontWeight: FontWeight.bold),
+            ),
             onTap: () => Navigator.pushNamed(context, '/admin-products'),
           ),
         ],
