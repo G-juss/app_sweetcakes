@@ -35,9 +35,9 @@ class HomeScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: TextField(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Buscar pastel...',
-                prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                prefixIcon: Icon(Icons.search, color: Colors.grey),
               ),
             ),
           ),
@@ -47,7 +47,10 @@ class HomeScreen extends StatelessWidget {
             child: StreamBuilder<List<Postre>>(
               stream: _firestoreService.getProductos(),
               builder: (context, snapshot) {
-                if (snapshot.hasError) return Center(child: Text('Error: ${snapshot.error}'));
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                }
+
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
                     child: CircularProgressIndicator(color: Color(0xFFFF80AB)),
@@ -55,6 +58,12 @@ class HomeScreen extends StatelessWidget {
                 }
 
                 final postres = snapshot.data ?? [];
+
+                // DEBUG (si lo ocupas, descomenta)
+                // debugPrint('HOME productos: ${postres.length}');
+                // for (final p in postres) {
+                //   debugPrint('HOME -> ${p.nombre} | ${p.id}');
+                // }
 
                 if (postres.isEmpty) {
                   return Center(
@@ -70,42 +79,59 @@ class HomeScreen extends StatelessWidget {
                             'Ir a Gestión de Productos',
                             style: TextStyle(color: Color(0xFFFF80AB)),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   );
                 }
 
-                return GridView.builder(
-                  padding: const EdgeInsets.all(12),
-                  itemCount: postres.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.70,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                  ),
-                  itemBuilder: (context, index) {
-                    return PostreCard(
-                      postre: postres[index],
-                      onAgregar: () async {
-                        // 1) Guardar en carrito (Firestore)
-                        await _firestoreService.agregarAlCarrito(postres[index]);
+                // ✅ Grid sin “vacío” en pantallas grandes (Chrome/web)
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    final width = constraints.maxWidth;
+                    final crossAxisCount = width > 1200 ? 4 : width > 900 ? 3 : 2;
 
-                        // 2) Confirmación visual
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('¡${postres[index].nombre} agregado al carrito! ✅'),
-                              backgroundColor: const Color(0xFFFF80AB),
-                              duration: const Duration(seconds: 1),
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          );
-                        }
+                    return GridView.builder(
+                      padding: const EdgeInsets.all(12),
+                      itemCount: postres.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: crossAxisCount,
+                        mainAxisExtent: 260, // ✅ altura fija (ajusta 240-300 si quieres)
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                      ),
+                      itemBuilder: (context, index) {
+                        final postre = postres[index];
+
+                        return PostreCard(
+                          postre: postre,
+                          onAgregar: () async {
+                            try {
+                              await _firestoreService.agregarAlCarrito(postre);
+
+                              if (!context.mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('¡${postre.nombre} agregado al carrito! ✅'),
+                                  backgroundColor: const Color(0xFFFF80AB),
+                                  duration: const Duration(seconds: 1),
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              );
+                            } catch (e) {
+                              if (!context.mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Error al agregar: $e'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          },
+                        );
                       },
                     );
                   },
@@ -127,7 +153,11 @@ class HomeScreen extends StatelessWidget {
             child: Center(
               child: Text(
                 'Menú',
-                style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -146,7 +176,10 @@ class HomeScreen extends StatelessWidget {
             leading: const Icon(Icons.admin_panel_settings_outlined, color: Color(0xFFFF80AB)),
             title: const Text(
               'Gestión de Productos',
-              style: TextStyle(color: Color(0xFFFF80AB), fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: Color(0xFFFF80AB),
+                fontWeight: FontWeight.bold,
+              ),
             ),
             onTap: () => Navigator.pushNamed(context, '/admin-products'),
           ),
